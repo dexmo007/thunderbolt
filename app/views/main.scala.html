@@ -1,0 +1,16 @@
+@(content: Html)(implicit messages: Messages, lang: Lang)
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>D.O.J.</title>
+        <link rel="shortcut icon" type="image/ico" href="@routes.Assets.at("/images/dojseal.ico")">
+        <link rel="stylesheet" type="text/css" href="@routes.Assets.at("semantic-ui/semantic.css")">
+        <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("semantic-ui/semantic.min.js")" type="text/javascript"></script>
+    </head>
+    <body>
+    @content
+    </body>
+</html>

@@ -1,0 +1,33 @@
+@import model.{Db, User}
+@import views.html.app._
+
+@(userId: String)(implicit messages: Messages, lang: Lang)
+
+@app(userId) {
+    <form>
+        <h1>@Messages("search.all")</h1>
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>@Messages("userId")</th>
+                    <th>@Messages("lastName")</th>
+                    <th>@Messages("firstName")</th>
+                    <th>@Messages("email")</th>
+                    <th>@Messages("pw")</th>
+                </tr>
+            </thead>
+            <tbody>
+            @for(user <- Db.query[User].fetch()) {
+                <tr>
+                    <td>@user.userId</td>
+                    <td>@user.lastName</td>
+                    <td>@user.firstName</td>
+                    <td>@user.email</td>
+                    <td>@user.pw</td>
+                    <td><button class="ui negative button" formaction="@routes.RestApi.delete(user.userId)">@Messages("button.delete")</button></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </form>
+}

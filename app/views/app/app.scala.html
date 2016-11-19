@@ -1,0 +1,96 @@
+@import model.Db
+@import model.User
+@(userId: String)(content: Html)(implicit messages: Messages, lang: Lang)
+
+@getFlag = @{
+    if(lang.code.contains("en")) "us" else lang.code
+}
+
+@getUsername = @{
+    val user = Db.query[User].whereEqual("userId", userId).fetchOne().get
+    user.firstName + " " + user.lastName
+}
+
+@main {
+    <script type="text/javascript">
+            $(function () {
+                // enables dropdown and redirects on change to change language path
+                $('.ui.dropdown').dropdown({
+                    action: function (text, value) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/lang',
+//                            data: {lang: value}
+                            contentType: 'text/plain',
+                            data: value
+                        }).done(function () {
+                            window.location.reload(false)
+                        })
+                    }
+                });
+                // sets the active item in the menu
+                var url = window.location.href;
+                $("#menu").find("a").each(function () {
+                            if (url == (this.href)) {
+                                $(this).addClass("active");
+                            }
+                        }
+                );
+            })
+    </script>
+    <div class="ui grid">
+        <div class="two wide column">
+            <div class="row">
+                <a href="@routes.Application.search()" class="ui fluid circular image">
+                    <img src="@routes.Assets.at("/images/dojseal.png")">
+                </a>
+            </div>
+            <div class="ui hidden divider"></div>
+            <div class="row">
+                <div id="menu" class="ui secondary vertical pointing menu">
+                    <a class="item" href="@routes.Application.search()">@Messages("menu.search")</a>
+                    <a class="item" href="@routes.Application.addUser()">@Messages("menu.add")</a>
+                </div>
+            </div>
+        </div>
+        <div class="fourteen wide column">
+            <div class="row">
+                <div class="ui hidden divider"></div>
+                <div class="ui grid">
+                    <div class="thirteen wide column">
+                        <h2>@Messages("welcome", getUsername)</h2>
+                    </div>
+                    <div class="one wide right aligned column">
+                        <div class="ui floating dropdown labeled search icon button">
+                            <i class="world icon"></i>
+                            <i class="@getFlag flag"></i>
+                            <div class="menu">
+                                <div class="item" data-value="en"><i class="us flag"></i> @Messages("lang.en")</div>
+                                @*<div class="item">French</div>*@
+                                <div class="item" data-value="de"><i class="de flag"></i> @Messages("lang.de")</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="two wide right aligned column">
+                        <form action="@routes.Auth.logout()">
+                            <button class="ui negative right labeled icon button">
+                                <i class="power icon"></i>
+                                @Messages("logout")
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="ui hidden divider"></div>
+            </div>
+            <div class="row">
+                <div class="ui grid">
+                    <div class="eleven wide column">
+                        <div class="ui segment">
+                        @content
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
