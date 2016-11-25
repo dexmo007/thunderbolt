@@ -1,0 +1,64 @@
+@import play.api.Configuration
+@()(implicit messages: Messages, lang: Lang, request: RequestHeader, conf: Configuration)
+
+<script type="text/javascript">
+        $(document).ready(function () {
+            $.getJSON("http://ip-api.com/json/?callback=?", function (data) {
+                var place = data.zip + '%20' + data.country;
+                // todo app id to conf
+                $.getJSON("https://query.yahooapis.com/v1/public/yql?" +
+                        "q=select * from weather.forecast " +
+                        "where woeid in (select woeid from geo.places(1) where text='" + place + "')" +
+                        "and u='c'" +
+                        "&format=json" +
+                        "&lang=de" +
+                        "&appid=@conf.getString("yahoo.appid").get" +
+                        "&callback=?", function (data) {
+                    var title = data.query.results.channel.title;
+                    var condition = data.query.results.channel.item.condition;
+                    var temp = condition.temp + ' °C';
+                    var date = condition.date;
+                    var code = condition.code;
+                    $('#weather').attr("style",
+                            "width: 300px;height: 200px;" +
+                            "background-image: url('/assets/images/weather/" + code + ".jpg') !important;" +
+                            "background-size: cover !important;");
+                    $('#title').append(title);
+                    $('#temp').append(temp);
+                    // gets localized string for description text
+                    $.get('/messages?id=weather.' + code, function (msg) {
+                        $('#text').append(msg);
+                    })
+                })
+            });
+        })
+</script>
+<style type="text/css">
+.temp {
+    margin: 10px;
+    font-size: 48px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+.title {
+    margin: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+.text {
+    margin-left: 10px;
+    margin-top: 40px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #FFFFFF;
+    align-self: flex-end;
+}
+</style>
+<div id="weather">
+    <p id="title" class="title"></p>
+    <p id="temp" class="temp"></p>
+    <p id="text" class="text"></p>
+</div>

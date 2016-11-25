@@ -1,4 +1,4 @@
-@(form: Form[(String, String)] = null)(implicit messages: Messages, lang: Lang)
+@(form: Form[(String, String)] = null)(implicit messages: Messages, lang: Lang, request: RequestHeader)
 
 @getValue(id: String) = @{
     if(form != null) form(id).value.getOrElse("") else ""
@@ -64,6 +64,7 @@
                     <button class="ui fluid large grey submit button">Login</button>
                 </div>
             </form>
+            @successMsg()
         </div>
     </div>
 }

@@ -1,11 +1,19 @@
 @import model.{Db, User}
 @import views.html.app._
+@import play.api.Configuration
+@()(implicit messages: Messages, lang: Lang, request: RequestHeader, conf: Configuration)
 
-@(userId: String)(implicit messages: Messages, lang: Lang)
-
-@app(userId) {
+@app {
+    <script type="text/javascript">
+            function confirmIfSelf(id) {
+                if (id == '@request.session.get(Security.username).get') {
+                    return confirm('@Messages("delete.confirm")')
+                }
+            }
+    </script>
     <form>
         <h1>@Messages("search.all")</h1>
+        @successMsg()
         <table class="ui celled table">
             <thead>
                 <tr>
@@ -24,7 +32,11 @@
                     <td>@user.firstName</td>
                     <td>@user.email</td>
                     <td>@user.pw</td>
-                    <td><button class="ui negative button" formaction="@routes.RestApi.delete(user.userId)">@Messages("button.delete")</button></td>
+                    <td>
+                        <button class="ui negative button"
+                        formaction="@routes.RestApi.delete(user.userId)"
+                        onclick="return confirmIfSelf('@user.userId')">@Messages("button.delete")</button>
+                    </td>
                 </tr>
             }
             </tbody>

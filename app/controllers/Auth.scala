@@ -6,7 +6,7 @@ import model.Db
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, Controller, Security}
 
 /**
@@ -14,7 +14,7 @@ import play.api.mvc.{Action, Controller, Security}
   */
 class Auth @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
-  def login = Action {
+  def login = Action { implicit request =>
     Ok(views.html.login.login())
   }
 
@@ -26,7 +26,7 @@ class Auth @Inject()(val messagesApi: MessagesApi) extends Controller with I18nS
   }
 
   def logout = Action {
-    Redirect(routes.Auth.login()).withNewSession
+    Redirect(routes.Auth.login()).withNewSession.flashing("success" -> Messages("login.logout"))
   }
 
   val existingUserIdConstraint: Constraint[String] = Constraint("constraints.validUserId")({
@@ -37,18 +37,18 @@ class Auth @Inject()(val messagesApi: MessagesApi) extends Controller with I18nS
         Invalid(ValidationError("error.existingUserId"))
   })
 
-  val existingUserId = nonEmptyText().verifying(existingUserIdConstraint)
+  private val existingUserId = nonEmptyText().verifying(existingUserIdConstraint)
 
   //noinspection MatchToPartialFunction
-  val validPasswordConstraint = Constraint[(String, String)]("constraints.validPassword")({
-    res => res match {
-      case (userId, pw) =>
-        if (check(userId, pw)) Valid
-        else Invalid(ValidationError("error.validPassword"))
-    }
+  private val validPasswordConstraint = Constraint[(String, String)]("constraints.validPassword")({
+    res =>
+      res match {
+        case (userId, pw) =>
+          if (check(userId, pw)) Valid
+          else Invalid(ValidationError("error.validPassword"))
+      }
   })
 
-  //noinspection MatchToPartialFunction
   val loginForm = Form {
     tuple(
       "userId" -> existingUserId,

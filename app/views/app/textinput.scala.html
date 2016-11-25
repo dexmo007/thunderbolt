@@ -1,20 +1,21 @@
 @import model.User
-@(form: Form[User], id: String)(implicit messages: Messages, lang: Lang)
+@import play.api.Configuration
+@(form: Form[User], id: String)(implicit messages: Messages, lang: Lang, request: RequestHeader, conf: Configuration)
 
-@getValue = @{
-    if(form != null) form(id).value.getOrElse("") else ""
-}
-
-<div class="field @if(form != null && form(id).hasErrors) {error}">
-    <label for="">@Messages(id)</label>
-    <input type="text"
-    id="@id"
-    name="@id"
-    placeholder="@Messages(id)"
-    value="@getValue"/>
-    @if(form != null && form(id).hasErrors) {
-        <div class="ui pointing red basic label">
-            <i class="attention icon"></i> @Messages(form.error(id).get.message)
-        </div>
+    @getValue = @{
+        if(form != null) form(id).value.getOrElse("") else ""
     }
-</div>
+
+    <div class="field @if(form != null && form(id).hasErrors) {error}">
+        <label for="">@Messages(id)</label>
+        <input type="text"
+        id="@id"
+        name="@id"
+        placeholder="@Messages(id)"
+        value="@getValue"/>
+        @if(form != null && form(id).hasErrors) {
+            <div class="ui pointing red basic label">
+                <i class="attention icon"></i> @Messages(form.error(id).get.message)
+            </div>
+        }
+    </div>

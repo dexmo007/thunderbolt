@@ -1,0 +1,46 @@
+@import play.api.Configuration
+@import views.html.app.app
+@(form: Form[String] = null, out: func.Function = null)(implicit messages: Messages, lang: Lang, request: RequestHeader, conf: Configuration)
+
+@getValue = @{
+    if(form != null) form("input").value.get else ""
+}
+
+@app {
+    <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+    <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML">
+    </script>
+    <div class="ui form">
+        <form id="xmath_form" action="@routes.RestApi.xMath()" method="post">
+            <div class="field @if(form != null && form.hasErrors) {error}">
+                <div class="ui big icon input">
+                    <input id="input" name="input" placeholder="@Messages("xmath.input")" value="@getValue" type="text">
+                    <i class="inverted circular angle double right link icon" onclick="$('#xmath_form').submit()"></i>
+                    @if(form != null && form.hasErrors) {
+                        <div class="ui pointing red basic label">
+                            <i class="attention icon"></i> @Messages(form.error("input").get.message)
+                        </div>
+                    }
+                </div>
+            </div>
+        </form>
+        @if(out != null) {
+            <div class="ui divider"></div>
+            <label>@Messages("xmath.function"):</label>
+            <div class="ui segment">
+                $f(x) = @out.toTexString $
+            </div>
+            <label>@Messages("xmath.deriv"):</label>
+            <div class="ui segment">
+                $f'(x) = @out.derive().toTexString $
+            </div>
+            <label>@Messages("xmath.integral"):</label>
+            <div class="ui segment">
+                $F(x) = @out.antiderive().toTexString $
+            </div>
+        }
+    </div>
+}

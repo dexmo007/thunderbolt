@@ -8,7 +8,7 @@ import play.api.mvc.Result
   */
 trait Secured {
 
-  def userId(request: RequestHeader) = request.session.get(Security.username)
+  def userId(request: RequestHeader): Option[String] = request.session.get(Security.username)
 
   def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Auth.login())
 
@@ -17,5 +17,4 @@ trait Secured {
       Action(request => f(user)(request))
     }
   }
-
 }

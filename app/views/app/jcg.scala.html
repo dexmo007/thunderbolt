@@ -1,0 +1,67 @@
+@import views.html.app.app
+@import play.api.Configuration
+@(form: Form[(String, String, Option[String])] = null, clazz: String = null)(implicit messages: Messages, lang: Lang, request: RequestHeader, conf: Configuration)
+
+@getJson = @{
+    if(form != null) form("json").value.get else ""
+}
+
+@annotate = @{
+    if(form == null || form("annotate").value.isDefined) "checked=\"checked\"" else ""
+}
+
+@app {
+    <script type="text/javascript">
+            $(function () {
+                $('#annotate_checkbox').checkbox();
+                var $dropdown = $('#jcg_dropdown');
+                $dropdown.dropdown();
+                @if(form != null) {
+                $dropdown.dropdown('set selected', '@form("lang").value.get');
+                }
+            })
+    </script>
+    <div class="ui form">
+        <form action="@routes.RestApi.jcg()" method="post">
+            <div class="field @if(form != null && form("json").hasErrors) {error}">
+                <label>@Messages("jcg.paste")</label>
+                <textarea name="json">@getJson</textarea>
+            </div>
+            @if(form != null && form("json").hasErrors) {
+                <div class="ui pointing red basic label">
+                    <i class="attention icon"></i> @Messages(form.error("json").get.message)
+                </div>
+                <div class="ui hidden divider"></div>
+            }
+            <div class="inline fields">
+                <div class="field @if(form != null && form("lang").hasErrors) {error}">
+                    <div id="jcg_dropdown" class="ui selection dropdown">
+                        <input name="lang" type="hidden">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">@Messages("jcg.lang")</div>
+                        <div class="menu">
+                        @for(gen <- JcgUtil.generators.values) {
+                            <div class="item" data-value="@gen.highlightClass">@gen.languageName</div>
+                        }
+                        </div>
+                    </div>
+                </div>
+                <div class="inline field">
+                    <div id="annotate_checkbox" class="ui slider checkbox">
+                        <input name="annotate" tabindex="0" class="hidden" @annotate type="checkbox">
+                        <label>@Messages("jcg.annotate")</label>
+                    </div>
+                </div>
+                <button class="ui primary button">@Messages("button.generate")</button>
+            </div>
+        </form>
+    </div>
+    @if(clazz != null) {
+        <link rel="stylesheet" href="@routes.Assets.at("highlight/styles/vs.css")">
+        <script src="@routes.Assets.at("highlight/highlight.pack.js")"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <div class="ui segment">
+            <pre><code class="@form("lang").value.get">@clazz</code></pre>
+        </div>
+    }
+}

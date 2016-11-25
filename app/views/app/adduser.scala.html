@@ -1,8 +1,9 @@
 @import model.User
 @import views.html.app._
-@(userId: String, form: Form[User] = null, success: Boolean = false)(implicit messages: Messages, lang: Lang)
+@import play.api.Configuration
+@(form: Form[User] = null)(implicit messages: Messages, lang: Lang, request: RequestHeader, conf: Configuration)
 
-@app(userId) {
+@app {
     <form class="ui form @if(form != null && form.hasErrors) {error}" action="@routes.RestApi.addUser()" method="post">
         <h1>@Messages("add.header")</h1>
         @textinput(form, "userId")
@@ -12,12 +13,7 @@
         @textinput(form, "pw")
         <button class="ui primary button">@Messages("button.add")</button>
     </form>
-    @if(success) {
-        <div class="ui success message">
-            <i class="close icon"></i>
-            <div class="header">@Messages("add.success")</div>
-        </div>
-    }
+    @successMsg()
 }
 
 

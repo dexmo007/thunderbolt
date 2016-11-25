@@ -6,15 +6,23 @@
 GET         /                        controllers.Auth.login
 POST        /auth                    controllers.Auth.authenticate
 GET         /logout                  controllers.Auth.logout
+
 # App page
 GET         /search                  controllers.Application.search
 GET         /add                     controllers.Application.addUser
-POST        /lang                   controllers.Application.setLang
+POST        /lang                    controllers.Application.setLang
+GET         /jcg                     controllers.Application.jcg
+GET         /translate               controllers.Application.translate
+GET         /xmath                   controllers.Application.xMath
 
 # REST api
 POST        /add                     controllers.RestApi.addUser
 GET         /users/all               controllers.RestApi.getUsers
 GET         /users/delete/:id        controllers.RestApi.delete(id: String)
+POST        /jcg                     controllers.RestApi.jcg
+GET         /messages                controllers.RestApi.messages(id: String)
+POST        /xmath                   controllers.RestApi.xMath
+
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file            controllers.Assets.at(path="/public", file)
 

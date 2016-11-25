@@ -1,26 +1,27 @@
 @import model.Db
 @import model.User
-@(userId: String)(content: Html)(implicit messages: Messages, lang: Lang)
+@import views.html.app._
+@import play.api.Configuration
+@(content: Html)(implicit messages: Messages, lang: Lang, request: RequestHeader, conf: Configuration)
 
 @getFlag = @{
     if(lang.code.contains("en")) "us" else lang.code
 }
 
 @getUsername = @{
-    val user = Db.query[User].whereEqual("userId", userId).fetchOne().get
-    user.firstName + " " + user.lastName
+    val id = request.session.get(Security.username).get
+    Db.query[User].whereEqual("userId", id).fetchOne().get.fullName
 }
 
 @main {
     <script type="text/javascript">
             $(function () {
-                // enables dropdown and redirects on change to change language path
-                $('.ui.dropdown').dropdown({
+                // enables dropdown and posts lang change then reloads page
+                $('#langdropdown').dropdown({
                     action: function (text, value) {
                         $.ajax({
                             type: 'POST',
                             url: '/lang',
-//                            data: {lang: value}
                             contentType: 'text/plain',
                             data: value
                         }).done(function () {
@@ -36,8 +37,9 @@
                             }
                         }
                 );
-            })
+            });
     </script>
+
     <div class="ui grid">
         <div class="two wide column">
             <div class="row">
@@ -50,6 +52,9 @@
                 <div id="menu" class="ui secondary vertical pointing menu">
                     <a class="item" href="@routes.Application.search()">@Messages("menu.search")</a>
                     <a class="item" href="@routes.Application.addUser()">@Messages("menu.add")</a>
+                    <a class="item" href="@routes.Application.jcg()">@Messages("menu.jcg")</a>
+                    <a class="item" href="@routes.Application.translate()">@Messages("menu.translate")</a>
+                    <a class="item" href="@routes.Application.xMath()">@Messages("menu.xmath")</a>
                 </div>
             </div>
         </div>
@@ -61,13 +66,13 @@
                         <h2>@Messages("welcome", getUsername)</h2>
                     </div>
                     <div class="one wide right aligned column">
-                        <div class="ui floating dropdown labeled search icon button">
+                        <div id="langdropdown" class="ui floating dropdown labeled search icon button">
                             <i class="world icon"></i>
                             <i class="@getFlag flag"></i>
                             <div class="menu">
                                 <div class="item" data-value="en"><i class="us flag"></i> @Messages("lang.en")</div>
-                                @*<div class="item">French</div>*@
                                 <div class="item" data-value="de"><i class="de flag"></i> @Messages("lang.de")</div>
+                                <div class="item" data-value="fr"><i class="fr flag"></i> @Messages("lang.fr")</div>
                             </div>
                         </div>
                     </div>
@@ -84,10 +89,13 @@
             </div>
             <div class="row">
                 <div class="ui grid">
-                    <div class="eleven wide column">
+                    <div class="twelve wide column">
                         <div class="ui segment">
                         @content
                         </div>
+                    </div>
+                    <div class="four wide column">
+                    @weather()
                     </div>
                 </div>
             </div>

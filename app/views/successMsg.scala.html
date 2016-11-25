@@ -1,0 +1,8 @@
+@()(implicit request: RequestHeader)
+
+@if(request.flash.get("success").isDefined) {
+    <div class="ui success message">
+        <i class="close icon" onclick="$('.ui.success.message').hide()"></i>
+        <div class="content"><i class="info circle icon"></i> @request.flash.get("success")</div>
+    </div>
+}

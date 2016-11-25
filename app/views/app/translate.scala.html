@@ -1,0 +1,57 @@
+@import play.api.Configuration
+@import views.html.app.app
+@()(implicit messages: Messages, lang: Lang, request: RequestHeader, conf: Configuration)
+
+@app {
+    <script type="text/javascript">
+            function getAllSupported(ui) {
+                $.getJSON("https://translate.yandex.net/api/v1.5/tr.json/getLangs?" +
+                        "key=@conf.getString("yandex.key")" +
+                        "&ui=" + ui +
+                        "callback=?", function (data) {
+                    alert(JSON.stringify(data.langs));
+                })
+            }
+            function submitTranslate(q) {
+                var url = 'https://translate.yandex.net/api/v1.5/tr.json/translate?' +
+                        'key=@conf.getString("yandex.key").get' +
+                        '&lang=en-de' +
+                        '&text=' + q +
+                        '&callback=?';
+                $.getJSON(url, function (data) {
+                    $('#translated').val(data.text);
+                });
+            }
+    </script>
+    <script type="text/javascript">
+            $(function () {
+                $('#source_text').on('input', function () {
+                    var q = $(this).val();
+                    submitTranslate(q);
+                })
+            })
+    </script>
+    <script type="text/javascript">
+            $(document).ready(function () {
+                $.getJSON('https://translate.yandex.net/api/v1.5/tr.json/getLangs?' +
+                        'key=@conf.getString("yandex.key")' +
+                        '&ui=en' +
+                        '&callback=?', function (data) {
+                    alert(JSON.stringify(data.langs));
+                })
+            })
+    </script>
+    <div class="ui form">
+        <form>
+            <div class="inline fields">
+                <div class="field">
+                    <textarea id="source_text" name="source" placeholder="Type something..."></textarea>
+                </div>
+                <div class="field">
+                    <textarea id="translated" name="translated" ></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+
+}
