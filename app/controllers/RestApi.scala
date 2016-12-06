@@ -152,26 +152,9 @@ class RestApi @Inject()(val messagesApi: MessagesApi, val configuration: Configu
   }
 
   // todo rm contraint (only nonEmpty is kept) -> try parsing if success -> OK(show func/value) else flash error
-  private val mathString = nonEmptyText().verifying(Constraint[String]("")(
-    plain =>
-      try {
-        FunctionParser.parse(plain)
-        Valid
-      } catch {
-        case _: Exception =>
-          try {
-            FunctionParser.evaluate(plain)
-            Valid
-          } catch {
-            case _: Exception =>
-              Invalid(ValidationError("error.mathString"))
-          }
-      }
-  ))
-
   private val mathForm = Form {
     single(
-      "input" -> mathString
+      "input" -> nonEmptyText
     )
   }
 
